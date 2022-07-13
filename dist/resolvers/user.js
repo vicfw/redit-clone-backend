@@ -84,12 +84,12 @@ let UserResolver = class UserResolver {
                 ],
             };
         }
-        if (options.username.length <= 3) {
+        if (options.password.length <= 3) {
             return {
                 errors: [
                     {
                         field: 'password',
-                        message: 'username cant have less than 3 characters',
+                        message: 'password cant have less than 3 characters',
                     },
                 ],
             };

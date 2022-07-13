@@ -55,7 +55,7 @@ export class UserResolver {
       user,
     };
   }
- 
+
   @Mutation(() => UserResponse)
   async register(
     @Arg('options') options: UsernamePasswordInput,
@@ -72,12 +72,12 @@ export class UserResolver {
       };
     }
 
-    if (options.username.length <= 3) {
+    if (options.password.length <= 3) {
       return {
         errors: [
           {
             field: 'password',
-            message: 'username cant have less than 3 characters',
+            message: 'password cant have less than 3 characters',
           },
         ],
       };

@@ -35,7 +35,7 @@ const main = async () => {
   app.use(
     session({
       store: new RedisStore({
-        client: redisClient,
+        client: redisClient as any,
         disableTouch: true,
       }),
       saveUninitialized: false,
@@ -74,4 +74,4 @@ main().catch((err) => {
   console.log(err);
 });
 
-//2:43:42 video timer
+//3:11:26 video timer

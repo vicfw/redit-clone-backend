@@ -9,7 +9,9 @@
     "dev2": "nodemon --exec ts-node src/index.ts",
     "start": "node dist/index.js",
     "start2": "ts-node src/index.ts",
-    "create:migration": "mikro-orm migration:create"
+    "create:migration": "mikro-orm migration:create",
+    "client":"yarn dev --prefix ../reditt-frontend/",
+    "run":"concurrently \"yarn watch\"  \"yarn dev\" \"yarn client\"" 
   },
   "keywords": [],
   "author": "",
@@ -37,6 +39,7 @@
     "@types/express-session": "^1.17.5",
     "@types/node": "^16.10.2",
     "@types/redis": "^4.0.11",
+    "concurrently": "^7.2.2",
     "ts-node": "^10.2.1",
     "typescript": "^4.4.3"
   },
