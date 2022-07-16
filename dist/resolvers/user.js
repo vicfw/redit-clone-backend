@@ -126,7 +126,9 @@ let UserResolver = class UserResolver {
         const valid = await argon2_1.default.verify(user.password, options.password);
         if (!valid) {
             return {
-                errors: [{ field: 'password', message: 'invalid login' }],
+                errors: [
+                    { field: 'password', message: 'username or password is wrong' },
+                ],
             };
         }
         req.session.userId = user.id;
