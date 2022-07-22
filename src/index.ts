@@ -11,10 +11,13 @@ import connectRedis, { Client } from 'connect-redis';
 import { COOKIE_NAME, __prod__ } from './constants';
 import { MyContext } from './types';
 import cors from 'cors';
+import { send } from 'process';
+import { sendMail } from './utils/sendEmail';
 
 // import session from 'express-session';
 
 const main = async () => {
+  await sendMail('bob@bob.com', 'hello there');
   const orm = await MikroORM.init(mikroConfig);
   await orm.getMigrator().up(); // run migration automatic
 
@@ -74,4 +77,4 @@ main().catch((err) => {
   console.log(err);
 });
 
-//3:47:46 video timer
+//4:18:35 video timer
