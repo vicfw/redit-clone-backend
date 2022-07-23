@@ -15,10 +15,10 @@ const redis_1 = require("redis");
 const connect_redis_1 = __importDefault(require("connect-redis"));
 const constants_1 = require("./constants");
 const cors_1 = __importDefault(require("cors"));
-const sendEmail_1 = require("./utils/sendEmail");
+const User_1 = require("./entities/User");
 const main = async () => {
-    await (0, sendEmail_1.sendMail)('bob@bob.com', 'hello there');
     const orm = await core_1.MikroORM.init(mikro_orm_config_1.default);
+    await orm.em.nativeDelete(User_1.User, {});
     await orm.getMigrator().up();
     const app = (0, express_1.default)();
     const RedisStore = (0, connect_redis_1.default)(express_session_1.default);
