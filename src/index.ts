@@ -1,27 +1,19 @@
 import { MikroORM } from '@mikro-orm/core';
-import mikroConfig from './mikro-orm.config';
-import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
+import connectRedis from 'connect-redis';
+import cors from 'cors';
+import express from 'express';
+import session from 'express-session';
+import Redis from 'ioredis';
 import { buildSchema } from 'type-graphql';
+import { COOKIE_NAME, __prod__ } from './constants';
+import mikroConfig from './mikro-orm.config';
 import { PostResolver } from './resolvers/post';
 import { UserResolver } from './resolvers/user';
-import session from 'express-session';
-import { createClient } from 'redis';
-import connectRedis, { Client } from 'connect-redis';
-import { COOKIE_NAME, __prod__ } from './constants';
 import { MyContext } from './types';
-import cors from 'cors';
-import { emit, send } from 'process';
-import { sendMail } from './utils/sendEmail';
-import { User } from './entities/User';
-
-// import session from 'express-session';
 
 const main = async () => {
-  // await sendMail('bob@bob.com', 'hello there');
   const orm = await MikroORM.init(mikroConfig);
-
-  await orm.em.nativeDelete(User, {});
 
   await orm.getMigrator().up(); // run migration automatic
 
@@ -29,8 +21,7 @@ const main = async () => {
   const app = express();
 
   const RedisStore = connectRedis(session);
-  const redisClient = createClient({ legacyMode: true });
-  redisClient.connect().catch(console.error);
+  const redis = new Redis();
 
   app.use(
     cors({
@@ -42,7 +33,7 @@ const main = async () => {
   app.use(
     session({
       store: new RedisStore({
-        client: redisClient as any,
+        client: redis as any,
         disableTouch: true,
       }),
       saveUninitialized: false,
@@ -63,7 +54,7 @@ const main = async () => {
       resolvers: [PostResolver, UserResolver],
       validate: false,
     }),
-    context: ({ req, res }): MyContext => ({ em: orm.em, req, res }), //if we return something here its gonna accessible in resolver
+    context: ({ req, res }): MyContext => ({ em: orm.em, req, res, redis }), //if we return something here its gonna accessible in resolver
   });
 
   await apolloServer.start();
@@ -81,4 +72,4 @@ main().catch((err) => {
   console.log(err);
 });
 
-//4:28:55 video timer
+//4:49:46 video timer

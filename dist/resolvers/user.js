@@ -22,6 +22,8 @@ const type_graphql_1 = require("type-graphql");
 const constants_1 = require("../constants");
 const User_1 = require("../entities/User");
 const UsernamePasswordInput_1 = require("./inputs/UsernamePasswordInput");
+const sendEmail_1 = require("../utils/sendEmail");
+const uuid_1 = require("uuid");
 let FieldError = class FieldError {
 };
 __decorate([
@@ -49,6 +51,16 @@ UserResponse = __decorate([
     (0, type_graphql_1.ObjectType)()
 ], UserResponse);
 let UserResolver = class UserResolver {
+    async forgotPassword(email, { em, redis }) {
+        const user = await em.findOne(User_1.User, { email });
+        if (!user) {
+            return true;
+        }
+        const token = (0, uuid_1.v4)();
+        await redis.set(constants_1.FORGET_PASSWORD_PREFIX + token, user.id, 'EX', 1000 * 60 * 60 * 24 * 3);
+        (0, sendEmail_1.sendMail)(email, `<a href='http://localhost:3000/change-password/${token}'>reset password</a>`);
+        return true;
+    }
     async me({ req, em }) {
         if (!req.session.userId) {
             return null;
@@ -99,7 +111,9 @@ let UserResolver = class UserResolver {
             });
         if (!user) {
             return {
-                errors: [{ field: 'username', message: "that username doesn't exist" }],
+                errors: [
+                    { field: 'usernameOrEmail', message: "that username doesn't exist" },
+                ],
             };
         }
         const valid = await argon2_1.default.verify(user.password, password);
@@ -129,6 +143,14 @@ let UserResolver = class UserResolver {
         });
     }
 };
+__decorate([
+    (0, type_graphql_1.Mutation)(() => Boolean),
+    __param(0, (0, type_graphql_1.Arg)('email')),
+    __param(1, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "forgotPassword", null);
 __decorate([
     (0, type_graphql_1.Query)(() => UserResponse, { nullable: true }),
     __param(0, (0, type_graphql_1.Ctx)()),
