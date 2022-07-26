@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+require("reflect-metadata");
 const core_1 = require("@mikro-orm/core");
 const apollo_server_express_1 = require("apollo-server-express");
 const connect_redis_1 = __importDefault(require("connect-redis"));
@@ -15,7 +16,9 @@ const constants_1 = require("./constants");
 const mikro_orm_config_1 = __importDefault(require("./mikro-orm.config"));
 const post_1 = require("./resolvers/post");
 const user_1 = require("./resolvers/user");
+const typeorm_config_1 = require("./typeorm.config");
 const main = async () => {
+    const conncetion = await typeorm_config_1.AppDataSource.initialize();
     const orm = await core_1.MikroORM.init(mikro_orm_config_1.default);
     await orm.getMigrator().up();
     const app = (0, express_1.default)();

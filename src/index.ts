@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { MikroORM } from '@mikro-orm/core';
 import { ApolloServer } from 'apollo-server-express';
 import connectRedis from 'connect-redis';
@@ -10,9 +11,12 @@ import { COOKIE_NAME, __prod__ } from './constants';
 import mikroConfig from './mikro-orm.config';
 import { PostResolver } from './resolvers/post';
 import { UserResolver } from './resolvers/user';
+import { AppDataSource } from './typeorm.config';
 import { MyContext } from './types';
 
 const main = async () => {
+  const conncetion = await AppDataSource.initialize();
+
   const orm = await MikroORM.init(mikroConfig);
 
   await orm.getMigrator().up(); // run migration automatic
@@ -54,7 +58,7 @@ const main = async () => {
       resolvers: [PostResolver, UserResolver],
       validate: false,
     }),
-    context: ({ req, res }): MyContext => ({ em: orm.em, req, res, redis }), //if we return something here its gonna accessible in resolver
+    context: ({ req, res }): MyContext => ({ em: orm.em, req, res, redis }), //if we return something here its gonna accessible in resolver in @Ctx() decorator
   });
 
   await apolloServer.start();
@@ -72,4 +76,4 @@ main().catch((err) => {
   console.log(err);
 });
 
-//5:02:48 video timer
+//5:29:50 video timer

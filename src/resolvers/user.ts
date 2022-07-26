@@ -43,14 +43,16 @@ export class UserResolver {
       return {
         errors: [
           {
-            field: 'password',
+            field: 'newPassword',
             message: 'password cant have less than 3 characters',
           },
         ],
       };
     }
 
-    const userId = await redis.get(FORGET_PASSWORD_PREFIX + token);
+    const key = FORGET_PASSWORD_PREFIX + token;
+
+    const userId = await redis.get(key);
 
     if (!userId) {
       return {
@@ -80,9 +82,9 @@ export class UserResolver {
 
     await em.persistAndFlush(user);
 
-    //login after change password
+    await redis.del(key); //deleting token ,so user cant renew his/her password with pervious token
 
-    req.session.userId = user.id;
+    req.session.userId = user.id; //login after change password
 
     return {
       user,

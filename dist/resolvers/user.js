@@ -56,13 +56,14 @@ let UserResolver = class UserResolver {
             return {
                 errors: [
                     {
-                        field: 'password',
+                        field: 'newPassword',
                         message: 'password cant have less than 3 characters',
                     },
                 ],
             };
         }
-        const userId = await redis.get(constants_1.FORGET_PASSWORD_PREFIX + token);
+        const key = constants_1.FORGET_PASSWORD_PREFIX + token;
+        const userId = await redis.get(key);
         if (!userId) {
             return {
                 errors: [
@@ -86,6 +87,7 @@ let UserResolver = class UserResolver {
         }
         user.password = await argon2_1.default.hash(newPassword);
         await em.persistAndFlush(user);
+        await redis.del(key);
         req.session.userId = user.id;
         return {
             user,
