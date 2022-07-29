@@ -1,5 +1,6 @@
-import { Field, Int, ObjectType } from 'type-graphql';
+import { Field, ObjectType } from 'type-graphql';
 import {
+  BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
@@ -9,7 +10,8 @@ import {
 
 @Entity()
 @ObjectType()
-export class Post {
+export class Post extends BaseEntity {
+  //using baseEntity allow us Use Post.find() and stuff like this..
   @Field()
   @PrimaryGeneratedColumn()
   id!: number;

@@ -9,7 +9,6 @@
     "dev2": "nodemon --exec ts-node src/index.ts",
     "start": "node dist/index.js",
     "start2": "ts-node src/index.ts",
-    "create:migration": "mikro-orm migration:create",
     "client": "yarn dev --prefix ../reditt-frontend/",
     "run": "concurrently \"yarn watch\"  \"yarn dev\" \"yarn client\""
   },
@@ -17,10 +16,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@mikro-orm/cli": "^4.5.9",
-    "@mikro-orm/core": "^4.5.9",
-    "@mikro-orm/migrations": "^4.5.9",
-    "@mikro-orm/postgresql": "^4.5.9",
     "apollo-server-express": "^3.3.0",
     "argon2": "^0.28.7",
     "connect-redis": "^6.1.3",
@@ -50,12 +45,6 @@
     "concurrently": "^7.2.2",
     "ts-node": "^10.2.1",
     "typescript": "^4.4.3"
-  },
-  "mikro-orm": {
-    "useTsNode": true,
-    "configPaths": [
-      "./src/mikro-orm.config.ts",
-      "./dist/mikro-orm.config.js"
-    ]
   }
+ 
 }

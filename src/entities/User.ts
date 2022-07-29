@@ -1,5 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 import {
+  BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
@@ -9,7 +10,7 @@ import {
 
 @Entity()
 @ObjectType()
-export class User {
+export class User extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
   id!: number;
@@ -19,7 +20,7 @@ export class User {
   username!: string;
 
   @Field()
-  @Column({ type: 'text' })
+  @Column({ unique: true })
   email!: string;
 
   @Column({ type: 'text' })
