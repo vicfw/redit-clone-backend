@@ -15,6 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostResolver = void 0;
 const Post_1 = require("../entities/Post");
 const type_graphql_1 = require("type-graphql");
+const PostInput_1 = require("./inputs/PostInput");
+const isAuth_1 = require("../middleware/isAuth");
 let PostResolver = class PostResolver {
     posts() {
         return Post_1.Post.find();
@@ -22,8 +24,8 @@ let PostResolver = class PostResolver {
     post(id) {
         return Post_1.Post.findOne({ where: { id } });
     }
-    async createPost(title) {
-        return Post_1.Post.create({ title }).save();
+    async createPost(input, { req }) {
+        return Post_1.Post.create(Object.assign(Object.assign({}, input), { creatorId: req.session.userId })).save();
     }
     async updatePost(title, id) {
         const post = await Post_1.Post.findOne({ where: { id } });
@@ -60,9 +62,11 @@ __decorate([
 ], PostResolver.prototype, "post", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Post_1.Post),
-    __param(0, (0, type_graphql_1.Arg)('title')),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuth),
+    __param(0, (0, type_graphql_1.Arg)('input')),
+    __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [PostInput_1.PostInput, Object]),
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "createPost", null);
 __decorate([

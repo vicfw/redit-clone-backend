@@ -11,12 +11,15 @@ import { PostResolver } from './resolvers/post';
 import { UserResolver } from './resolvers/user';
 import { AppDataSource } from './typeorm.config';
 import { MyContext } from './types';
+import { Post } from './entities/Post';
 
 const main = async () => {
   await AppDataSource.initialize();
 
   //server
   const app = express();
+
+  // await Post.delete({});
 
   const RedisStore = connectRedis(session);
   const redis = new Redis();
