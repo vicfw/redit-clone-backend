@@ -11,12 +11,26 @@ import {
 import { MyContext } from 'src/types';
 import { PostInput } from './inputs/PostInput';
 import { isAuth } from '../middleware/isAuth';
+import { AppDataSource } from '../typeorm.config';
 
 @Resolver()
 export class PostResolver {
   @Query(() => [Post])
-  posts(): Promise<Post[] | undefined> {
-    return Post.find();
+  async posts(
+    @Arg('limit', () => Int) limit: number,
+    @Arg('cursor', () => String, { nullable: true }) cursor: string | null
+  ): Promise<Post[] | undefined> {
+    const realLimit = Math.min(50, limit);
+
+    const qb = await AppDataSource.getRepository(Post)
+      .createQueryBuilder('p')
+      .orderBy('"createdAt"', 'DESC')
+      .take(limit);
+
+    if (cursor) {
+      qb.where('"createdAt" < :cursor', { cursor: new Date(parseInt(cursor)) });
+    }
+    return qb.getMany();
   }
 
   @Query(() => Post, { nullable: true })

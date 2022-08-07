@@ -1,20 +1,21 @@
-import 'reflect-metadata';
 import { ApolloServer } from 'apollo-server-express';
 import connectRedis from 'connect-redis';
 import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
 import Redis from 'ioredis';
+import 'reflect-metadata';
 import { buildSchema } from 'type-graphql';
 import { COOKIE_NAME, __prod__ } from './constants';
 import { PostResolver } from './resolvers/post';
 import { UserResolver } from './resolvers/user';
 import { AppDataSource } from './typeorm.config';
 import { MyContext } from './types';
-import { Post } from './entities/Post';
 
 const main = async () => {
   await AppDataSource.initialize();
+
+  // await AppDataSource.runMigrations();
 
   //server
   const app = express();
@@ -73,4 +74,4 @@ main().catch((err) => {
   console.log(err);
 });
 
-//6:28:35 video timer
+//7:02:58 video timer

@@ -1,3 +1,4 @@
+import path from 'path';
 import { DataSource } from 'typeorm';
 import { Post } from './entities/Post';
 import { User } from './entities/User';
@@ -11,5 +12,6 @@ export const AppDataSource = new DataSource({
   database: 'reddit2',
   entities: [User, Post],
   synchronize: true,
+  migrations: [path.join(__dirname, './migrations/*')],
   logging: true,
 });
