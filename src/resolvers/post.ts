@@ -16,6 +16,7 @@ import { MyContext } from 'src/types';
 import { PostInput } from './inputs/PostInput';
 import { isAuth } from '../middleware/isAuth';
 import { AppDataSource } from '../typeorm.config';
+import { Updoot } from '../entities/Updoot';
 
 @ObjectType()
 class PaginatedPosts {
@@ -31,6 +32,39 @@ export class PostResolver {
   @FieldResolver(() => String)
   textSnippet(@Root() root: Post) {
     return root.text.slice(0, 50);
+  }
+
+  @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
+  async vote(
+    @Arg('postId', () => Int) postId: number,
+    @Arg('value', () => Int) value: number,
+    @Ctx() { req }: MyContext
+  ) {
+    const isUpdoot = value !== 1;
+    const { userId } = req.session;
+    const realValue = isUpdoot ? 1 : -1;
+
+    await Updoot.insert({
+      userId,
+      postId,
+      value: realValue,
+    });
+
+    await AppDataSource.query(
+      `
+      start transaction;
+
+      insert into updoot ("userId","postId",value)
+      values(${userId},${postId},${realValue});
+
+      update post p
+      set p.points = p.points + ${realValue}
+      where p.id = ${postId};
+    `
+    );
+
+    return true;
   }
 
   @Query(() => PaginatedPosts)
@@ -60,8 +94,6 @@ export class PostResolver {
       ${cursor ? `where p."createdAt" < $2` : ''}
       order by p."createdAt" DESC
       limit $1 
-
-
     `,
       replacement
     );
@@ -79,8 +111,6 @@ export class PostResolver {
     // }
 
     // const posts = await qb.getMany();
-
-    console.log(posts, 'posts');
 
     return {
       posts: posts.slice(0, realLimit),
