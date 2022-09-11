@@ -17,6 +17,7 @@ import { PostInput } from './inputs/PostInput';
 import { isAuth } from '../middleware/isAuth';
 import { AppDataSource } from '../typeorm.config';
 import { Updoot } from '../entities/Updoot';
+import { toNamespacedPath } from 'path';
 
 @ObjectType()
 class PaginatedPosts {
@@ -45,29 +46,46 @@ export class PostResolver {
     const { userId } = req.session;
     const realValue = isUpdoot ? 1 : -1;
 
-    console.log(userId, postId, realValue);
+    const updoot = await Updoot.findOne({ where: { postId, userId } });
 
-    // await Updoot.insert({
-    //   userId,
-    //   postId,
-    //   value: realValue,
-    // });
+    if (updoot && updoot.value !== realValue) {
+      //the user has voted on the post before
+      await AppDataSource.transaction(async (tm) => {
+        await tm.query(
+          `
+          update updoot
+          set value = $1
+          where "postId" = $2 and "userId" = $3
+        `,
+          [realValue, postId, userId]
+        );
 
-    await AppDataSource.query(
-      ` 
-      START TRANSACTION;
+        await tm.query(
+          `
+        update post 
+        set points = points + $1
+        where id = $2;
+        `,
+          [2 * realValue, postId]
+        );
+      });
+    } else if (!updoot) {
+      // has never voted
+      await AppDataSource.transaction(async (tm) => {
+        await tm.query(
+          `
+            insert into updoot ("userId","postId",value)
+            values (${userId},${postId},${realValue});
+          `
+        );
 
-      insert into updoot ("userId","postId",value)
-      values (${userId},${postId},${realValue});
-
-      update post 
-      set points = points + ${realValue}
-      where id = ${postId};
-
-      COMMIT;
-      
-    `
-    );
+        await tm.query(`
+        update post 
+        set points = points + ${realValue}
+        where id = ${postId};
+        `);
+      });
+    }
 
     return true;
   }
