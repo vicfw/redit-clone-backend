@@ -1,6 +1,5 @@
 import argon2 from 'argon2';
 import { MyContext } from 'src/types';
-import { validateRegister } from '../utils/validateRegister';
 import {
   Arg,
   Ctx,
@@ -12,13 +11,13 @@ import {
   Resolver,
   Root,
 } from 'type-graphql';
+import { v4 } from 'uuid';
 import { COOKIE_NAME, FORGET_PASSWORD_PREFIX } from '../constants';
 import { User } from '../entities/User';
-import { UsernamePasswordInput } from './inputs/UsernamePasswordInput';
-import { sendMail } from '../utils/sendEmail';
-import { v4 } from 'uuid';
 import { AppDataSource } from '../typeorm.config';
-import { userInfo } from 'os';
+import { sendMail } from '../utils/sendEmail';
+import { validateRegister } from '../utils/validateRegister';
+import { UsernamePasswordInput } from './inputs/UsernamePasswordInput';
 @ObjectType()
 class FieldError {
   @Field()
@@ -37,7 +36,7 @@ class UserResponse {
 
 @Resolver(User)
 export class UserResolver {
-  @FieldResolver(() => String)
+  @FieldResolver(() => String) //field resolver method should be same with the actual field,with field resolver you can use condition to a single field
   email(@Root() user: User, @Ctx() { req }: MyContext) {
     if (req.session.userId === user.id) {
       return user.email;

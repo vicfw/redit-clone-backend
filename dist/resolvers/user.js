@@ -17,14 +17,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserResolver = void 0;
 const argon2_1 = __importDefault(require("argon2"));
-const validateRegister_1 = require("../utils/validateRegister");
 const type_graphql_1 = require("type-graphql");
+const uuid_1 = require("uuid");
 const constants_1 = require("../constants");
 const User_1 = require("../entities/User");
-const UsernamePasswordInput_1 = require("./inputs/UsernamePasswordInput");
-const sendEmail_1 = require("../utils/sendEmail");
-const uuid_1 = require("uuid");
 const typeorm_config_1 = require("../typeorm.config");
+const sendEmail_1 = require("../utils/sendEmail");
+const validateRegister_1 = require("../utils/validateRegister");
+const UsernamePasswordInput_1 = require("./inputs/UsernamePasswordInput");
 let FieldError = class FieldError {
 };
 __decorate([

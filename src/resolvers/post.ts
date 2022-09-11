@@ -41,26 +41,31 @@ export class PostResolver {
     @Arg('value', () => Int) value: number,
     @Ctx() { req }: MyContext
   ) {
-    const isUpdoot = value !== 1;
+    const isUpdoot = value !== -1;
     const { userId } = req.session;
     const realValue = isUpdoot ? 1 : -1;
 
-    await Updoot.insert({
-      userId,
-      postId,
-      value: realValue,
-    });
+    console.log(userId, postId, realValue);
+
+    // await Updoot.insert({
+    //   userId,
+    //   postId,
+    //   value: realValue,
+    // });
 
     await AppDataSource.query(
-      `
-      start transaction;
+      ` 
+      START TRANSACTION;
 
       insert into updoot ("userId","postId",value)
-      values(${userId},${postId},${realValue});
+      values (${userId},${postId},${realValue});
 
-      update post p
-      set p.points = p.points + ${realValue}
-      where p.id = ${postId};
+      update post 
+      set points = points + ${realValue}
+      where id = ${postId};
+
+      COMMIT;
+      
     `
     );
 

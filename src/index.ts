@@ -7,7 +7,6 @@ import Redis from 'ioredis';
 import 'reflect-metadata';
 import { buildSchema } from 'type-graphql';
 import { COOKIE_NAME, __prod__ } from './constants';
-import { Post } from './entities/Post';
 import { PostResolver } from './resolvers/post';
 import { UserResolver } from './resolvers/user';
 import { AppDataSource } from './typeorm.config';
@@ -75,4 +74,4 @@ main().catch((err) => {
   console.log(err);
 });
 
-//8:46:40 video timer i didnt push this time
+//9:24:37 video timer

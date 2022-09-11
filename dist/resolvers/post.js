@@ -18,7 +18,6 @@ const type_graphql_1 = require("type-graphql");
 const PostInput_1 = require("./inputs/PostInput");
 const isAuth_1 = require("../middleware/isAuth");
 const typeorm_config_1 = require("../typeorm.config");
-const Updoot_1 = require("../entities/Updoot");
 let PaginatedPosts = class PaginatedPosts {
 };
 __decorate([
@@ -37,23 +36,22 @@ let PostResolver = class PostResolver {
         return root.text.slice(0, 50);
     }
     async vote(postId, value, { req }) {
-        const isUpdoot = value !== 1;
+        const isUpdoot = value !== -1;
         const { userId } = req.session;
         const realValue = isUpdoot ? 1 : -1;
-        await Updoot_1.Updoot.insert({
-            userId,
-            postId,
-            value: realValue,
-        });
+        console.log(userId, postId, realValue);
         await typeorm_config_1.AppDataSource.query(`
-      start transaction;
+      START TRANSACTION;
 
       insert into updoot ("userId","postId",value)
-      values(${userId},${postId},${realValue});
+      values (${userId},${postId},${realValue});
 
-      update post p
-      set p.points = p.points + ${realValue}
-      where p.id = ${postId};
+      update post 
+      set points = points + ${realValue}
+      where id = ${postId};
+
+      COMMIT;
+      
     `);
         return true;
     }
