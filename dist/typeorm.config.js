@@ -10,15 +10,15 @@ const Post_1 = require("./entities/Post");
 const Updoot_1 = require("./entities/Updoot");
 const User_1 = require("./entities/User");
 exports.AppDataSource = new typeorm_1.DataSource({
-    type: 'postgres',
-    host: 'localhost',
+    type: "postgres",
+    host: "localhost",
     port: 5432,
-    username: 'postgres',
-    password: 'admin',
-    database: 'reddit2',
+    username: "postgres",
+    password: "admin",
+    database: "reddit2",
     entities: [User_1.User, Post_1.Post, Updoot_1.Updoot],
     synchronize: true,
-    migrations: [path_1.default.join(__dirname, './migrations/*')],
+    migrations: [path_1.default.join(__dirname, "./migrations/*")],
     logging: true,
 });
 //# sourceMappingURL=typeorm.config.js.map
