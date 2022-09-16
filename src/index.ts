@@ -11,6 +11,8 @@ import { PostResolver } from './resolvers/post';
 import { UserResolver } from './resolvers/user';
 import { AppDataSource } from './typeorm.config';
 import { MyContext } from './types';
+import { createUserLoader } from './utils/createUserLoader';
+import { createVoteStatusLoader } from './utils/createVoteStatusLoader';
 
 const main = async () => {
   await AppDataSource.initialize();
@@ -56,7 +58,13 @@ const main = async () => {
       resolvers: [PostResolver, UserResolver],
       validate: false,
     }),
-    context: ({ req, res }): MyContext => ({ req, res, redis }), //if we return something here its gonna accessible in resolver in @Ctx() decorator
+    context: ({ req, res }) => ({
+      req,
+      res,
+      redis,
+      userLoader: createUserLoader(),
+      updootLoader: createVoteStatusLoader(),
+    }), //if we return something here its gonna accessible in resolver in @Ctx() decorator
   });
 
   await apolloServer.start();
@@ -74,4 +82,4 @@ main().catch((err) => {
   console.log(err);
 });
 
-//10:02:1 video timer
+//11:38:11 video timer

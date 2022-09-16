@@ -15,6 +15,8 @@ const constants_1 = require("./constants");
 const post_1 = require("./resolvers/post");
 const user_1 = require("./resolvers/user");
 const typeorm_config_1 = require("./typeorm.config");
+const createUserLoader_1 = require("./utils/createUserLoader");
+const createVoteStatusLoader_1 = require("./utils/createVoteStatusLoader");
 const main = async () => {
     await typeorm_config_1.AppDataSource.initialize();
     const app = (0, express_1.default)();
@@ -45,7 +47,13 @@ const main = async () => {
             resolvers: [post_1.PostResolver, user_1.UserResolver],
             validate: false,
         }),
-        context: ({ req, res }) => ({ req, res, redis }),
+        context: ({ req, res }) => ({
+            req,
+            res,
+            redis,
+            userLoader: (0, createUserLoader_1.createUserLoader)(),
+            updootLoader: (0, createVoteStatusLoader_1.createVoteStatusLoader)(),
+        }),
     });
     await apolloServer.start();
     apolloServer.applyMiddleware({

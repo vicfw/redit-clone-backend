@@ -13,12 +13,13 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostResolver = void 0;
-const Post_1 = require("../entities/Post");
+const User_1 = require("../entities/User");
 const type_graphql_1 = require("type-graphql");
-const PostInput_1 = require("./inputs/PostInput");
+const Post_1 = require("../entities/Post");
+const Updoot_1 = require("../entities/Updoot");
 const isAuth_1 = require("../middleware/isAuth");
 const typeorm_config_1 = require("../typeorm.config");
-const Updoot_1 = require("../entities/Updoot");
+const PostInput_1 = require("./inputs/PostInput");
 let PaginatedPosts = class PaginatedPosts {
 };
 __decorate([
@@ -35,6 +36,19 @@ PaginatedPosts = __decorate([
 let PostResolver = class PostResolver {
     textSnippet(root) {
         return root.text.slice(0, 50);
+    }
+    creator(post, { userLoader }) {
+        return userLoader.load(post.creatorId);
+    }
+    async voteStatus(post, { updootLoader, req }) {
+        if (!req.session.userId) {
+            return null;
+        }
+        const updoot = await updootLoader.load({
+            postId: post.id,
+            userId: req.session.userId,
+        });
+        updoot ? updoot.value : null;
     }
     async vote(postId, value, { req }) {
         const isUpdoot = value !== -1;
@@ -74,28 +88,14 @@ let PostResolver = class PostResolver {
         const realLimit = Math.min(50, limit);
         const realLimitPlusOne = realLimit + 1;
         const replacement = [realLimitPlusOne];
-        if (req.session.userId) {
-            replacement.push(req.session.userId);
-        }
-        let cursorIdx = 3;
         if (cursor) {
             replacement.push(new Date(parseInt(cursor)));
-            cursorIdx = replacement.length;
         }
         console.log(req.session.userId, 'req.session.userId');
         const posts = await typeorm_config_1.AppDataSource.query(`
-      SELECT p.*, 
-      json_build_object( 
-      'id', u.id,  
-      'username', u.username,
-      'email', u.email
-      ) creator,
-      ${req.session.userId
-            ? '(select value from updoot where "userId" = $2 and "postId" = p.id) "voteStatus"'
-            : 'null as "voteStatus"'} 
+      SELECT p.* 
       from post p
-      inner join public.user u on u.id = p."creatorId"
-      ${cursor ? `where p."createdAt" < $${cursorIdx}` : ''}
+      ${cursor ? `where p."createdAt" < $2` : ''}
       order by p."createdAt" DESC
       limit $1 
     `, replacement);
@@ -110,22 +110,26 @@ let PostResolver = class PostResolver {
     async createPost(input, { req }) {
         return Post_1.Post.create(Object.assign(Object.assign({}, input), { creatorId: req.session.userId })).save();
     }
-    async updatePost(title, id) {
-        const post = await Post_1.Post.findOne({ where: { id } });
-        if (!post)
-            return null;
-        if (typeof title !== 'undefined') {
-            post.title = title;
-            await Post_1.Post.update({ id }, { title });
-        }
-        return post;
+    async updatePost(title, text, id, { req }) {
+        const query = typeorm_config_1.AppDataSource.createQueryBuilder();
+        const result = await query
+            .update(Post_1.Post)
+            .set({ title, text })
+            .where('id = :id and "creatorId" = :creatorId', {
+            id,
+            creatorId: req.session.userId,
+        })
+            .returning('*')
+            .execute();
+        return result.raw[0];
     }
-    async deletePost(id) {
+    async deletePost(id, { req }) {
         try {
-            await Post_1.Post.delete(id);
+            await Post_1.Post.delete({ id, creatorId: req.session.userId });
             return true;
         }
-        catch (_a) {
+        catch (e) {
+            console.log(e.message);
             return false;
         }
     }
@@ -137,6 +141,22 @@ __decorate([
     __metadata("design:paramtypes", [Post_1.Post]),
     __metadata("design:returntype", void 0)
 ], PostResolver.prototype, "textSnippet", null);
+__decorate([
+    (0, type_graphql_1.FieldResolver)(() => User_1.User),
+    __param(0, (0, type_graphql_1.Root)()),
+    __param(1, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Post_1.Post, Object]),
+    __metadata("design:returntype", Promise)
+], PostResolver.prototype, "creator", null);
+__decorate([
+    (0, type_graphql_1.FieldResolver)(() => type_graphql_1.Int, { nullable: true }),
+    __param(0, (0, type_graphql_1.Root)()),
+    __param(1, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Post_1.Post, Object]),
+    __metadata("design:returntype", Promise)
+], PostResolver.prototype, "voteStatus", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Boolean),
     (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuth),
@@ -174,17 +194,22 @@ __decorate([
 ], PostResolver.prototype, "createPost", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Post_1.Post, { nullable: true }),
-    __param(0, (0, type_graphql_1.Arg)('title', () => String, { nullable: true })),
-    __param(1, (0, type_graphql_1.Arg)('id')),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuth),
+    __param(0, (0, type_graphql_1.Arg)('title', { nullable: true })),
+    __param(1, (0, type_graphql_1.Arg)('test', { nullable: true })),
+    __param(2, (0, type_graphql_1.Arg)('id', () => type_graphql_1.Int)),
+    __param(3, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Number]),
+    __metadata("design:paramtypes", [String, String, Number, Object]),
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "updatePost", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Boolean),
-    __param(0, (0, type_graphql_1.Arg)('id')),
+    (0, type_graphql_1.UseMiddleware)(isAuth_1.isAuth),
+    __param(0, (0, type_graphql_1.Arg)('id', () => type_graphql_1.Int)),
+    __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "deletePost", null);
 PostResolver = __decorate([
