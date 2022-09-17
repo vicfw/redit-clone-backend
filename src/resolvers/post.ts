@@ -56,7 +56,11 @@ export class PostResolver {
       userId: req.session.userId,
     });
 
-    updoot ? updoot.value : null;
+    if (updoot) {
+      return updoot.value;
+    } else {
+      return null;
+    }
   }
 
   @Mutation(() => Boolean)
@@ -128,7 +132,6 @@ export class PostResolver {
     if (cursor) {
       replacement.push(new Date(parseInt(cursor)));
     }
-    console.log(req.session.userId, 'req.session.userId'); // the issue
 
     const posts = await AppDataSource.query(
       `
@@ -224,8 +227,6 @@ export class PostResolver {
       await Post.delete({ id, creatorId: req.session.userId });
       return true;
     } catch (e) {
-      console.log(e.message);
-
       return false;
     }
   }

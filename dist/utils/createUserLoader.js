@@ -8,7 +8,6 @@ const dataloader_1 = __importDefault(require("dataloader"));
 const User_1 = require("../entities/User");
 const typeorm_1 = require("typeorm");
 const createUserLoader = () => new dataloader_1.default(async (userIds) => {
-    console.log(userIds, 'userIds');
     const users = await User_1.User.findBy({ id: (0, typeorm_1.In)(userIds) });
     const userIdToUser = {};
     users.forEach((u) => {

@@ -12,7 +12,7 @@ import { UserResolver } from './resolvers/user';
 import { AppDataSource } from './typeorm.config';
 import { MyContext } from './types';
 import { createUserLoader } from './utils/createUserLoader';
-import { createVoteStatusLoader } from './utils/createVoteStatusLoader';
+import { createUpdootLoader } from './utils/createVoteStatusLoader';
 
 const main = async () => {
   await AppDataSource.initialize();
@@ -63,7 +63,7 @@ const main = async () => {
       res,
       redis,
       userLoader: createUserLoader(),
-      updootLoader: createVoteStatusLoader(),
+      updootLoader: createUpdootLoader(),
     }), //if we return something here its gonna accessible in resolver in @Ctx() decorator
   });
 
@@ -73,13 +73,9 @@ const main = async () => {
     cors: false,
   });
 
-  app.listen(4000, () => {
-    console.log('server is running');
-  });
+  app.listen(4000, () => {});
 };
 
-main().catch((err) => {
-  console.log(err);
-});
+main().catch((err) => {});
 
-//11:38:11 video timer
+//13:11:01 video timer

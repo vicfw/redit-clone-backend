@@ -192,7 +192,6 @@ let UserResolver = class UserResolver {
             req.session.destroy((err) => {
                 res.clearCookie(constants_1.COOKIE_NAME);
                 if (err) {
-                    console.log(err);
                     resolve(false);
                     return;
                 }

@@ -21,8 +21,6 @@ async function sendMail(to, html) {
         subject: 'Change Password ✔',
         html,
     });
-    console.log('Message sent: %s', info.messageId);
-    console.log('Preview URL: %s', nodemailer_1.default.getTestMessageUrl(info));
 }
 exports.sendMail = sendMail;
 //# sourceMappingURL=sendEmail.js.map

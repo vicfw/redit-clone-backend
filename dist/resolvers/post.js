@@ -48,7 +48,12 @@ let PostResolver = class PostResolver {
             postId: post.id,
             userId: req.session.userId,
         });
-        updoot ? updoot.value : null;
+        if (updoot) {
+            return updoot.value;
+        }
+        else {
+            return null;
+        }
     }
     async vote(postId, value, { req }) {
         const isUpdoot = value !== -1;
@@ -91,7 +96,6 @@ let PostResolver = class PostResolver {
         if (cursor) {
             replacement.push(new Date(parseInt(cursor)));
         }
-        console.log(req.session.userId, 'req.session.userId');
         const posts = await typeorm_config_1.AppDataSource.query(`
       SELECT p.* 
       from post p
@@ -129,7 +133,6 @@ let PostResolver = class PostResolver {
             return true;
         }
         catch (e) {
-            console.log(e.message);
             return false;
         }
     }

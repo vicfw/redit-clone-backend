@@ -52,7 +52,7 @@ const main = async () => {
             res,
             redis,
             userLoader: (0, createUserLoader_1.createUserLoader)(),
-            updootLoader: (0, createVoteStatusLoader_1.createVoteStatusLoader)(),
+            updootLoader: (0, createVoteStatusLoader_1.createUpdootLoader)(),
         }),
     });
     await apolloServer.start();
@@ -60,11 +60,7 @@ const main = async () => {
         app,
         cors: false,
     });
-    app.listen(4000, () => {
-        console.log('server is running');
-    });
+    app.listen(4000, () => { });
 };
-main().catch((err) => {
-    console.log(err);
-});
+main().catch((err) => { });
 //# sourceMappingURL=index.js.map
