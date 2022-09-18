@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build":"tsc",
+    "build": "tsc",
     "watch": "tsc -w",
     "dev": "nodemon dist/index.js",
     "dev2": "nodemon --exec ts-node src/index.ts",
-    "start": "node dist/index.js",
+    "start": "vercel dev",
     "start2": "ts-node src/index.ts",
     "client": "yarn dev --prefix ../reditt-frontend/",
     "run": "concurrently \"yarn watch\"  \"yarn dev\" \"yarn client\""
@@ -32,7 +32,8 @@
     "reflect-metadata": "^0.1.13",
     "type-graphql": "^1.1.1",
     "typeorm": "^0.3.7",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "vercel": "^28.2.5"
   },
   "devDependencies": {
     "@types/connect-redis": "^0.0.18",
