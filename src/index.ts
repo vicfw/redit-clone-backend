@@ -63,7 +63,7 @@ const main = async () => {
         httpOnly: true,
         secure: __prod__, //only works in https
         sameSite: 'lax', //crsf
-        domain: 'codeponder.com',
+        domain: __prod__ ? '.codeponder.com' : undefined,
       },
     })
   );
