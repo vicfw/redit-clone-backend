@@ -14,7 +14,6 @@ exports.AppDataSource = new typeorm_1.DataSource({
     host: 'localhost',
     port: 5432,
     entities: [User_1.User, Post_1.Post, Updoot_1.Updoot],
-    synchronize: true,
     migrations: [path_1.default.join(__dirname, './migrations/*')],
     logging: false,
     url: process.env.DATABASE_URL,

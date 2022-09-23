@@ -21,6 +21,11 @@ const createVoteStatusLoader_1 = require("./utils/createVoteStatusLoader");
 const main = async () => {
     await typeorm_config_1.AppDataSource.initialize();
     const app = (0, express_1.default)();
+    app.set('trust proxy', 1);
+    app.use((0, cors_1.default)({
+        origin: process.env.CORS_ORIGIN,
+        credentials: true,
+    }));
     const redis = new ioredis_1.default(process.env.NODE_ENV === 'development'
         ? {}
         : {
@@ -31,10 +36,6 @@ const main = async () => {
             db: 0,
         });
     const RedisStore = (0, connect_redis_1.default)(express_session_1.default);
-    app.use((0, cors_1.default)({
-        origin: process.env.CORS_ORIGIN,
-        credentials: true,
-    }));
     app.use((0, express_session_1.default)({
         store: new RedisStore({
             client: redis,
@@ -45,10 +46,12 @@ const main = async () => {
         resave: false,
         name: constants_1.COOKIE_NAME,
         cookie: {
+            path: '/',
             maxAge: 1000 * 60 * 60 * 24 * 265 * 10,
             httpOnly: true,
             secure: constants_1.__prod__,
             sameSite: 'lax',
+            domain: constants_1.__prod__ ? '.codeponder.com' : undefined,
         },
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
