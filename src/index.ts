@@ -22,6 +22,13 @@ const main = async () => {
   //server
   const app = express();
 
+  app.use(
+    cors({
+      origin: process.env.CORS_ORIGIN,
+      credentials: true,
+    })
+  );
+
   // await Post.delete({});
 
   const redis = new Redis(
@@ -37,13 +44,6 @@ const main = async () => {
   );
 
   const RedisStore = connectRedis(session);
-
-  app.use(
-    cors({
-      origin: process.env.CORS_ORIGIN,
-      credentials: true,
-    })
-  );
 
   app.use(
     session({

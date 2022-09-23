@@ -9,7 +9,7 @@ export const AppDataSource = new DataSource({
   host: 'localhost',
   port: 5432,
   entities: [User, Post, Updoot],
-  synchronize: true,
+  // synchronize: true,
   migrations: [path.join(__dirname, './migrations/*')],
   logging: false,
   // url: 'postgres://gtaflbda:7g88kK-fQHNPIVVTHmkU26Ca2AXBHJpG@jelani.db.elephantsql.com/gtaflbda',
