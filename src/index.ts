@@ -22,6 +22,8 @@ const main = async () => {
   //server
   const app = express();
 
+  app.use('trust proxy', 1);
+
   app.use(
     cors({
       origin: process.env.CORS_ORIGIN,
@@ -56,6 +58,7 @@ const main = async () => {
       resave: false,
       name: COOKIE_NAME,
       cookie: {
+        path: '/',
         maxAge: 1000 * 60 * 60 * 24 * 265 * 10, //10 years
         httpOnly: true,
         secure: __prod__, //only works in https
