@@ -1,5 +1,6 @@
 import { ApolloServer } from 'apollo-server-express';
 import connectRedis from 'connect-redis';
+import 'dotenv-safe/config';
 import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
@@ -10,7 +11,6 @@ import { COOKIE_NAME, __prod__ } from './constants';
 import { PostResolver } from './resolvers/post';
 import { UserResolver } from './resolvers/user';
 import { AppDataSource } from './typeorm.config';
-import { MyContext } from './types';
 import { createUserLoader } from './utils/createUserLoader';
 import { createUpdootLoader } from './utils/createVoteStatusLoader';
 
@@ -24,12 +24,23 @@ const main = async () => {
 
   // await Post.delete({});
 
+  const redis = new Redis(
+    process.env.NODE_ENV === 'development'
+      ? {}
+      : {
+          port: 15421, // Redis port
+          host: 'redis-15421.c244.us-east-1-2.ec2.cloud.redislabs.com', // Redis host
+          username: 'default', // needs Redis >= 6
+          password: 'reddit',
+          db: 0, // Defaults to 0
+        }
+  );
+
   const RedisStore = connectRedis(session);
-  const redis = new Redis();
 
   app.use(
     cors({
-      origin: 'http://localhost:3000',
+      origin: process.env.CORS_ORIGIN,
       credentials: true,
     })
   );
@@ -41,7 +52,7 @@ const main = async () => {
         disableTouch: true,
       }),
       saveUninitialized: false,
-      secret: 'asdszxczxasqweasd',
+      secret: process.env.SESSION_SECRET,
       resave: false,
       name: COOKIE_NAME,
       cookie: {
@@ -73,7 +84,9 @@ const main = async () => {
     cors: false,
   });
 
-  app.listen(4000, () => {});
+  app.listen(parseInt(process.env.PORT), () => {
+    console.log('server connected');
+  });
 };
 
 main().catch((err) => {});

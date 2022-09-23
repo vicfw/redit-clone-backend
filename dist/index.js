@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const apollo_server_express_1 = require("apollo-server-express");
 const connect_redis_1 = __importDefault(require("connect-redis"));
+require("dotenv-safe/config");
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
 const express_session_1 = __importDefault(require("express-session"));
@@ -20,10 +21,18 @@ const createVoteStatusLoader_1 = require("./utils/createVoteStatusLoader");
 const main = async () => {
     await typeorm_config_1.AppDataSource.initialize();
     const app = (0, express_1.default)();
+    const redis = new ioredis_1.default(process.env.NODE_ENV === 'development'
+        ? {}
+        : {
+            port: 15421,
+            host: 'redis-15421.c244.us-east-1-2.ec2.cloud.redislabs.com',
+            username: 'default',
+            password: 'reddit',
+            db: 0,
+        });
     const RedisStore = (0, connect_redis_1.default)(express_session_1.default);
-    const redis = new ioredis_1.default();
     app.use((0, cors_1.default)({
-        origin: 'http://localhost:3000',
+        origin: process.env.CORS_ORIGIN,
         credentials: true,
     }));
     app.use((0, express_session_1.default)({
@@ -32,7 +41,7 @@ const main = async () => {
             disableTouch: true,
         }),
         saveUninitialized: false,
-        secret: 'asdszxczxasqweasd',
+        secret: process.env.SESSION_SECRET,
         resave: false,
         name: constants_1.COOKIE_NAME,
         cookie: {
@@ -60,7 +69,9 @@ const main = async () => {
         app,
         cors: false,
     });
-    app.listen(4000, () => { });
+    app.listen(parseInt(process.env.PORT), () => {
+        console.log('server connected');
+    });
 };
 main().catch((err) => { });
 //# sourceMappingURL=index.js.map

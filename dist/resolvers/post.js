@@ -90,6 +90,7 @@ let PostResolver = class PostResolver {
         return true;
     }
     async posts(limit, cursor, { req }) {
+        console.log('requested');
         const realLimit = Math.min(50, limit);
         const realLimitPlusOne = realLimit + 1;
         const replacement = [realLimitPlusOne];

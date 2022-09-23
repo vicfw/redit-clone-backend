@@ -13,12 +13,10 @@ exports.AppDataSource = new typeorm_1.DataSource({
     type: 'postgres',
     host: 'localhost',
     port: 5432,
-    username: 'postgres',
-    password: 'admin',
-    database: 'reddit2',
     entities: [User_1.User, Post_1.Post, Updoot_1.Updoot],
     synchronize: true,
     migrations: [path_1.default.join(__dirname, './migrations/*')],
-    logging: true,
+    logging: false,
+    url: process.env.DATABASE_URL,
 });
 //# sourceMappingURL=typeorm.config.js.map
