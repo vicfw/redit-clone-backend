@@ -22,7 +22,7 @@ const main = async () => {
   //server
   const app = express();
 
-  app.use('trust proxy', 1);
+  app.set('trust proxy', 1);
 
   app.use(
     cors({
