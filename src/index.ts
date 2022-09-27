@@ -61,7 +61,7 @@ const main = async () => {
         path: '/',
         maxAge: 1000 * 60 * 60 * 24 * 265 * 10, //10 years
         httpOnly: true,
-        secure: __prod__, //only works in https
+        secure: true, //only works in https
         sameSite: 'lax', //crsf
         domain: __prod__ ? '.codeponder.com' : undefined,
       },
@@ -94,5 +94,3 @@ const main = async () => {
 };
 
 main().catch((err) => {});
-
-//13:11:01 video timer

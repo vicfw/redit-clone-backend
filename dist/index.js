@@ -49,7 +49,7 @@ const main = async () => {
             path: '/',
             maxAge: 1000 * 60 * 60 * 24 * 265 * 10,
             httpOnly: true,
-            secure: constants_1.__prod__,
+            secure: true,
             sameSite: 'lax',
             domain: constants_1.__prod__ ? '.codeponder.com' : undefined,
         },
